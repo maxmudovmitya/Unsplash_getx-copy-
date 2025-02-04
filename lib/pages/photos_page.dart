@@ -1,8 +1,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:ngdemo16/models/collection_model.dart';
 
+import '../controller/photos_controller.dart';
 import '../models/photo_model.dart';
 import '../services/http_service.dart';
 import '../services/log_service.dart';
@@ -18,40 +21,15 @@ class PhotosPage extends StatefulWidget {
 }
 
 class _PhotosPageState extends State<PhotosPage> {
-  bool isLoading = false;
-  List<Photo> items = [];
 
-  _callDetailsPage(Photo photo) {
-    Navigator.of(context)
-        .push(MaterialPageRoute(builder: (BuildContext context) {
-      return DetailsPage(
-        photo: photo,
-      );
-    }));
-  }
+  final PhotosController controller = Get.put(PhotosController());
+  // controller.apiCollectionPhotos(collection!.id);
 
-  apiCollectionPhotos() async {
-    setState(() {
-      isLoading = true;
-    });
-
-    var response = await Network.GET(
-        Network.API_COLLECTIONS_PHOTOS
-            .replaceFirst(":id", widget.collection!.id),
-        Network.paramsCollectionsPhotos(1));
-    List<Photo> photos = Network.parseCollectionsPhotos(response!);
-    LogService.i(photos.length.toString());
-
-    setState(() {
-      items = photos;
-      isLoading = false;
-    });
-  }
 
   @override
   void initState() {
     super.initState();
-    apiCollectionPhotos();
+    controller.apiCollectionPhotos(widget.collection!.id);
   }
 
   @override
@@ -74,31 +52,34 @@ class _PhotosPageState extends State<PhotosPage> {
           ),
         ),
       ),
-      body: Stack(
-        children: [
-          MasonryGridView.builder(
-            gridDelegate: SliverSimpleGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2),
-            itemCount: items.length,
-            mainAxisSpacing: 2,
-            crossAxisSpacing: 2,
-            itemBuilder: (context, index) {
-              return _itemOfPhoto(items[index], index);
-            },
-          ),
-          isLoading
-              ? Center(child: CircularProgressIndicator())
-              : SizedBox.shrink(),
-        ],
-      ),
+      body: GetBuilder<PhotosController>(
+        builder: (controller) {
+          return  Stack(
+            children: [
+              MasonryGridView.builder(
+                gridDelegate: SliverSimpleGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2),
+                itemCount: controller.items.length,
+                mainAxisSpacing: 2,
+                crossAxisSpacing: 2,
+                itemBuilder: (context, index) {
+                  return _itemOfPhoto(controller.items[index], index);
+                },
+              ),
+              controller.isLoading
+                  ? Center(child: CircularProgressIndicator())
+                  : SizedBox.shrink(),
+            ],
+          );
+        }
+      )
     );
   }
 
   Widget _itemOfPhoto(Photo photo, int index) {
     return GestureDetector(
         onTap: () {
-          _callDetailsPage(photo);
-        },
+          Get.to(DetailsPage(photo: photo));         },
         child: Stack(
           children: [
             Container(

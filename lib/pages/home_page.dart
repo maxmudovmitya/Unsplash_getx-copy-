@@ -1,12 +1,16 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:ngdemo16/models/collection_model.dart';
-import 'package:ngdemo16/models/photo_model.dart';
-import 'package:ngdemo16/models/search_photos_res.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
+// import 'package:ngdemo16/models/collection_model.dart';
+// import 'package:ngdemo16/models/photo_model.dart';
+// import 'package:ngdemo16/models/search_photos_res.dart';
 import 'package:ngdemo16/pages/collection_page.dart';
 import 'package:ngdemo16/pages/search_page.dart';
-import 'package:ngdemo16/services/http_service.dart';
-import 'package:ngdemo16/services/log_service.dart';
+// import 'package:ngdemo16/services/http_service.dart';
+// import 'package:ngdemo16/services/log_service.dart';
+
+import '../controller/home_controller.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -16,14 +20,10 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  PageController? _pageController;
-  int _currentTap = 0;
 
-  @override
-  void initState() {
-    super.initState();
-    _pageController = PageController();
-  }
+  final controller = Get.put(HomeController());
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -45,14 +45,14 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
       body: PageView(
-        controller: _pageController,
+        controller: controller.pageController,
         children: [
           SearchPage(),
           CollectionPage(),
         ],
         onPageChanged: (int index) {
           setState(() {
-            _currentTap = index;
+            controller.currentTap = index;
           });
         },
       ),
@@ -70,14 +70,8 @@ class _HomePageState extends State<HomePage> {
             size: 32,
           )),
         ],
-        onTap: (int index) {
-          setState(() {
-            _currentTap = index;
-          });
-          _pageController!.animateToPage(index,
-              duration: Duration(milliseconds: 200), curve: Curves.easeIn);
-        },
-        currentIndex: _currentTap,
+        onTap: (index) => controller.changePage(index),
+        currentIndex: controller.currentTap,
         activeColor: Colors.white,
       ),
     );

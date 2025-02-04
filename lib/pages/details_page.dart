@@ -1,6 +1,6 @@
-import 'dart:io';
+//import 'dart:io';
 
-import 'package:cached_network_image/cached_network_image.dart';
+// import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:ngdemo16/models/photo_model.dart';
 
@@ -14,14 +14,6 @@ class DetailsPage extends StatefulWidget {
 }
 
 class _DetailsPageState extends State<DetailsPage> {
-
-  Future<void> downloadImage(String url) async {
-
-  }
-
-  Future<void> shareImage(String url) async {
-
-  }
 
 
   @override
@@ -43,40 +35,40 @@ class _DetailsPageState extends State<DetailsPage> {
             color: Colors.white,
           ),
         ),
-        actions: [
-          IconButton(
-            onPressed: (){
-              shareImage(widget.photo!.urls.full);
-            },
-            icon: Icon(Icons.ios_share, color: Colors.white,),
+        // actions: [
+          // IconButton(
+          //   onPressed: (){
+          //     shareImage(widget.photo!.urls.full);
+          //   },
+          //   icon: Icon(Icons.ios_share, color: Colors.white,),
           ),
-        ],
-      ),
-      body: Container(
-        width: double.infinity,
-        child: Stack(
-          children: [
-            InteractiveViewer(
-              panEnabled: true,
-              minScale: 1.0,
-              maxScale: 4.0,
-              child: CachedNetworkImage(
-                imageUrl: widget.photo!.urls.full,
-                fit: BoxFit.cover,
-                height: double.infinity,
-              ),
-            )
-          ],
-        ),
-      ),
+        //],
+      //),
+      //body: Container(
+        //width: double.infinity,
+        //child: Stack(
+          //children: [
+            //InteractiveViewer(
+              //panEnabled: true,
+              //minScale: 1.0,
+              //maxScale: 4.0,
+              //child: CachedNetworkImage(
+                //imageUrl: widget.photo!.urls.full,
+                //fit: BoxFit.cover,
+                //height: double.infinity,
+            //  ),
+           // )
+         //],
+     //   ),
+   //   ),
 
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.black,
-        onPressed: (){
-          downloadImage(widget.photo!.urls.full);
-        },
-        child: Icon(Icons.file_download, color: Colors.white,),
-      ),
+     // floatingActionButton: FloatingActionButton(
+  //      backgroundColor: Colors.black,
+ //       onPressed: (){
+ //         downloadImage(widget.photo!.urls.full);
+     //   },
+  //      child: Icon(Icons.file_download, color: Colors.white,),
+   //  ),
     );
   }
 }

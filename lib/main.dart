@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get_core/src/get_main.dart';
 
 import 'pages/home_page.dart';
 
@@ -20,6 +21,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       home: HomePage(),
+
     );
   }
 }

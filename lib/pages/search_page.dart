@@ -1,8 +1,12 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:ngdemo16/controller/search_controller.dart';
 import 'package:ngdemo16/models/photo_model.dart';
 
+import '../controller/photos_controller.dart';
 import '../models/search_photos_res.dart';
 import '../services/http_service.dart';
 import '../services/log_service.dart';
@@ -16,68 +20,43 @@ class SearchPage extends StatefulWidget {
 }
 
 class _SearchPageState extends State<SearchPage> {
-  bool isLoading = false;
-  List<Photo> items = [];
-
-  _callDetailsPage(Photo photo) {
-    Navigator.of(context)
-        .push(MaterialPageRoute(builder: (BuildContext context) {
-      return DetailsPage(
-        photo: photo,
-      );
-    }));
-  }
-
-  apiSearchPhotos() async {
-    setState(() {
-      isLoading = true;
-    });
-
-    var response = await Network.GET(
-        Network.API_SEARCH_PHOTOS, Network.paramsSearchPhotos("unsplash", 1));
-    SearchPhotosRes searchPhotosRes = Network.parseSearchPhotos(response!);
-    LogService.i(searchPhotosRes.results.length.toString());
-
-    setState(() {
-      items.addAll(searchPhotosRes.results);
-      isLoading = false;
-    });
-  }
+  final SearchsController controller = Get.put(SearchsController());
 
   @override
   void initState() {
     super.initState();
-    apiSearchPhotos();
+    controller.apiSearchPhotos();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
-      body: Stack(
-        children: [
-          MasonryGridView.builder(
-            gridDelegate: SliverSimpleGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2),
-            itemCount: items.length,
-            mainAxisSpacing: 2,
-            crossAxisSpacing: 2,
-            itemBuilder: (context, index) {
-              return _itemOfPhoto(items[index], index);
-            },
-          ),
-          isLoading
-              ? Center(child: CircularProgressIndicator())
-              : SizedBox.shrink(),
-        ],
-      ),
-    );
+        backgroundColor: Colors.black,
+        body: GetBuilder<SearchsController>(builder: (controller) {
+          return Stack(
+            children: [
+              MasonryGridView.builder(
+                gridDelegate: SliverSimpleGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2),
+                itemCount: controller.items.length,
+                mainAxisSpacing: 2,
+                crossAxisSpacing: 2,
+                itemBuilder: (context, index) {
+                  return _itemOfPhoto(controller.items[index], index);
+                },
+              ),
+              controller.isLoading
+                  ? Center(child: CircularProgressIndicator())
+                  : SizedBox.shrink(),
+            ],
+          );
+        }));
   }
 
   Widget _itemOfPhoto(Photo photo, int index) {
     return GestureDetector(
       onTap: () {
-        _callDetailsPage(photo);
+        Get.to(() => DetailsPage(photo: photo));
       },
       child: Stack(
         children: [

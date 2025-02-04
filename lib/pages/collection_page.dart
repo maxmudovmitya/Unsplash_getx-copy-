@@ -1,80 +1,54 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:ngdemo16/pages/photos_page.dart';
-
+import '../controller/collection_controller.dart';
 import '../models/collection_model.dart';
-import '../services/http_service.dart';
-import '../services/log_service.dart';
 
 class CollectionPage extends StatefulWidget {
-  const CollectionPage({super.key});
-
   @override
   State<CollectionPage> createState() => _CollectionPageState();
 }
 
 class _CollectionPageState extends State<CollectionPage> {
-  bool isLoading = false;
-  List<Collection> items = [];
+  final CollectionController controller = Get.put(CollectionController());
 
-  _callPhotosPage(Collection collection) {
-    Navigator.of(context)
-        .push(MaterialPageRoute(builder: (BuildContext context) {
-      return PhotosPage(
-        collection: collection,
-      );
-    }));
-  }
-
-  apiCollectionList() async {
-    setState(() {
-      isLoading = true;
-    });
-
-    var response = await Network.GET(
-        Network.API_COLLECTIONS, Network.paramsCollections(1));
-    List<Collection> collections = Network.parseCollections(response!);
-    LogService.i(collections.length.toString());
-
-    setState(() {
-      items = collections;
-      isLoading = false;
-    });
-  }
+  // void callPhotosPage(Collection collection) {
+  //   Get.to(() => PhotosPage(collection: collection));
+  // }
 
   @override
   void initState() {
     super.initState();
-    apiCollectionList();
+    controller.apiCollectionList();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.black,
-      body: Stack(
-        children: [
-          ListView.builder(
-            itemCount: items.length,
-            itemBuilder: (context, index) {
-              return _itemOfCollection(items[index]);
-            },
+    return GetBuilder<CollectionController>(
+      builder: (controller) {
+        return Scaffold(
+          backgroundColor: Colors.black,
+          body: Stack(
+            children: [
+              ListView.builder(
+                itemCount: controller.items.length,
+                itemBuilder: (context, index) {
+                  return _itemOfCollection(controller, controller.items[index]);
+                },
+              ),
+              if (controller.isLoading)
+                Center(child: CircularProgressIndicator()),
+            ],
           ),
-          isLoading
-              ? Center(
-                  child: CircularProgressIndicator(),
-                )
-              : SizedBox.shrink(),
-        ],
-      ),
+        );
+      },
     );
   }
 
-  Widget _itemOfCollection(Collection collection) {
+  Widget _itemOfCollection(CollectionController controller, Collection collection) {
     return GestureDetector(
-      onTap: () {
-        _callPhotosPage(collection);
-      },
+      onTap: () => Get.to(() => PhotosPage(collection: collection)),
       child: Container(
         width: double.infinity,
         child: Stack(
@@ -85,14 +59,16 @@ class _CollectionPageState extends State<CollectionPage> {
               height: 300,
               width: double.infinity,
             ),
-
             Container(
               padding: EdgeInsets.all(16),
               height: 300,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  Text(collection.title, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),)
+                  Text(
+                    collection.title,
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+                  ),
                 ],
               ),
             ),
