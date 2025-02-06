@@ -23,7 +23,6 @@ class PhotosPage extends StatefulWidget {
 class _PhotosPageState extends State<PhotosPage> {
 
   final PhotosController controller = Get.put(PhotosController());
-  // controller.apiCollectionPhotos(collection!.id);
 
 
   @override
@@ -44,7 +43,7 @@ class _PhotosPageState extends State<PhotosPage> {
         ),
         leading: IconButton(
           onPressed: () {
-            Navigator.of(context).pop();
+            Get.back();
           },
           icon: Icon(
             Icons.arrow_back_ios,
